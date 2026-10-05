@@ -255,8 +255,8 @@
     const rows = S.rows[k];
     if (!rows.length) { box.innerHTML = '<p class="none">판매한 게 없으면 비워두세요.</p>'; return; }
     box.innerHTML = rows.map(function (r, i) {
-      return '<div class="row' + (L.sum ? ' one' : '') + '">' +
-        (L.sum ? '' : '<input class="rowin' + (L.a.num ? ' num' : '') + '" data-k="' + k + '" data-i="' + i + '" data-f="a" value="' + esc(r.a) + '" placeholder="' + esc(L.a.ph) + '" aria-label="' + esc(L.t) + ' ' + (i + 1) + '번째 ' + (L.money ? '내용' : '항목') + '"' + (L.a.num ? ' inputmode="numeric"' : '') + (L.names ? ' list="dl-' + k + '"' : '') + '>') +
+      return '<div class="row">' +
+        ('<input class="rowin' + (L.a.num ? ' num' : '') + '" data-k="' + k + '" data-i="' + i + '" data-f="a" value="' + esc(r.a) + '" placeholder="' + esc(L.a.ph) + '" aria-label="' + esc(L.t) + ' ' + (i + 1) + '번째 ' + (L.money ? '내용' : '항목') + '"' + (L.a.num ? ' inputmode="numeric"' : '') + (L.names ? ' list="dl-' + k + '"' : '') + '>') +
         '<input class="rowin num" data-k="' + k + '" data-i="' + i + '" data-f="b" value="' + esc(r.b) + '" placeholder="' + esc(L.b.ph) + '" aria-label="' + esc(L.t) + ' ' + (i + 1) + '번째 ' + (L.money ? '금액' : '수량') + '" inputmode="numeric">' +
         '<button type="button" class="rm" data-rm="' + k + '" data-i="' + i + '" aria-label="' + (i + 1) + '번째 줄 지우기">×</button></div>';
     }).join('');
@@ -310,7 +310,11 @@
       }
       if (!on(L.k)) return;
       const rows = validRows(L);
-      if (rows.length && L.sum) o.push('', '<' + L.t + '>', fmt(String(sumOf(rows))) + '원');
+      if (rows.length && L.sum) {
+        o.push('', '<' + L.t + '>');
+        rows.forEach(function (r) { o.push((r.a.trim() ? r.a.trim() + ' - ' : '') + fmt(r.b) + '원'); });
+        if (rows.length > 1) o.push('합계 ' + fmt(String(sumOf(rows))) + '원');
+      }
       else if (rows.length) { o.push('', '<' + L.t + '>'); rows.forEach(function (r) { o.push(lineOf(L, r)); }); }
       else none(L.t);
     });
@@ -320,12 +324,6 @@
       if (cl.length) { o.push('', '<' + c.t + '>'); o = o.concat(cl); }
       else none(c.t);
     });
-    if (on('tasks')) {
-      const cold = S.tasks.d === todayKey() ? S.tasks : { done: {}, time: '' };
-      if (cold.time || cold.done.cold) {
-        o.push('', '<저온 2차 물류>', (cold.time ? cold.time + ' 도착, ' : '') + (cold.done.cold ? '정리 완료' : '정리 전'));
-      } else none('저온 2차 물류');
-    }
     if (on('note')) {
       if ((S.note || '').trim()) o.push('', '<특이사항>', S.note.trim());
       else none('특이사항');
