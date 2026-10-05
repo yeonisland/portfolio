@@ -6,7 +6,7 @@
   const LISTS = [
     { k: 'cig', t: '담배 보루 판매', a: { ph: '에쎄 체인지 4mg', num: false }, b: { ph: '보루 수', num: true }, names: true },
     { k: 'transfer', t: '계좌이체', a: { ph: '메모(선택)', num: false }, b: { ph: '금액', num: true }, money: true, sum: true },
-    { k: 'refund', t: '부분환불', a: { ph: '내용', num: false }, b: { ph: '금액', num: true }, money: true }
+    { k: 'refund', t: '부분환불', a: { ph: '내용(선택)', num: false }, b: { ph: '금액', num: true }, money: true }
   ];
   let BAGS = ['5L', '10L', '20L', '50L', '75L'];
   let STICKERS = [1000, 2000, 3000, 5000, 8000, 11000, 13000];
@@ -268,13 +268,13 @@
   }
 
   function validRows(L) {
-    return S.rows[L.k].filter(function (r) { return L.sum ? r.b.trim() : r.a.trim() && r.b.trim(); });
+    return S.rows[L.k].filter(function (r) { return (L.sum || L.money) ? r.b.trim() : r.a.trim() && r.b.trim(); });
   }
   function sumOf(rows) {
     return rows.reduce(function (a, r) { return a + (Number(digits(r.b)) || 0); }, 0);
   }
   function lineOf(L, r) {
-    if (L.money) return r.a.trim() + ' - ' + fmt(r.b) + '원';
+    if (L.money) return (r.a.trim() ? r.a.trim() + ' - ' : '') + fmt(r.b) + '원';
     if (L.k === 'sticker') return fmt(r.a) + ' - ' + r.b.trim();
     return r.a.trim() + ' - ' + r.b.trim();
   }
